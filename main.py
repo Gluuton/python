@@ -1,11 +1,7 @@
 import pygame
-from globalvars import *
-from classes import *
 
 pygame.init()
-Screen = pygame.display.set_mode(WINDOWSIZE)
-Clock = pygame.time.Clock()
-Running = True
+
 
 # !CONST
 WINDOWSIZE = pygame.Vector2(1024, 576)
@@ -14,10 +10,12 @@ FPS_LIMIT = 60
 
 SQUARESIZE = 16
 NUMSQUARE = (int)(WINDOWSIZE.x / SQUARESIZE)
+
+
 # !CONST
 
 # VARS
-CAMERA_OFFSET = pygame.Vector2(0, 0)
+Camera_Offset = pygame.Vector2(0, 0)
 
 showGrid = True
 DeltaTime = 0
@@ -26,22 +24,28 @@ DeltaTime = 0
 
 
 # Methods
-def moveCamera(moveSpeed,CAMERA_OFFSET):
+def moveCamera(moveSpeed, CAM_OFF):
 
     keyPressed = pygame.key.get_pressed()
 
     if (keyPressed[pygame.K_RIGHT]):
-        CAMERA_OFFSET.x += moveSpeed * DeltaTime
+        CAM_OFF.x += moveSpeed * DeltaTime
     if (keyPressed[pygame.K_LEFT]):
-        CAMERA_OFFSET.x -= moveSpeed * DeltaTime
+        CAM_OFF.x -= moveSpeed * DeltaTime
     if (keyPressed[pygame.K_UP]):
-        CAMERA_OFFSET.y -= moveSpeed * DeltaTime
+        CAM_OFF.y -= moveSpeed * DeltaTime
     if (keyPressed[pygame.K_DOWN]):
-        CAMERA_OFFSET.y += moveSpeed * DeltaTime
+        CAM_OFF.y += moveSpeed * DeltaTime
+    
+    CAM_OFF.x = max(0, min(CAM_OFF.x, SCREENSIZE.x - WINDOWSIZE.x))
+    CAM_OFF.y = max(0, min(CAM_OFF.y, SCREENSIZE.y - WINDOWSIZE.y))
 # !Methods
 
 
 
+Screen = pygame.display.set_mode(WINDOWSIZE)
+Clock = pygame.time.Clock()
+Running = True
 
 while Running:
     # poll for events
@@ -49,15 +53,15 @@ while Running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             Running = False
-    CAMERA_OFFSET = moveCamera(200, CAMERA_OFFSET)
+    moveCamera(200, Camera_Offset)
 
     # clear screen
     Screen.fill("white")
     if(showGrid):
         for X in range(0, (int)(SCREENSIZE.x), SQUARESIZE):
-            pygame.draw.line(Screen, "Black", ((float)(X) - CAMERA_OFFSET, 0), ((float)(X) - CAMERA_OFFSET.x, SCREENSIZE.y))
+            pygame.draw.line(Screen, "Black", ((X - Camera_Offset.x), 0), (X - Camera_Offset.x, SCREENSIZE.y))
         for Y in range(0, (int)(SCREENSIZE.y), SQUARESIZE):
-            pygame.draw.line(Screen, "Black", (0, Y - CAMERA_OFFSET), (SCREENSIZE.x, Y - Camera_Offset))
+            pygame.draw.line(Screen, "Black", (0, Y - Camera_Offset.y), (SCREENSIZE.x, Y - Camera_Offset.y))
 
     # update screen
     pygame.display.flip()
